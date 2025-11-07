@@ -1,140 +1,166 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portal Akademik - Input Nilai</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">Portal Akademik</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="index.html">Input Nilai</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="data.html">Lihat Data Mahasiswa</a>
-                    </li>
-                </ul>
-            </div>
+      <div class="container">
+        <a class="navbar-brand" href="index.html">Portal Akademik</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="index.html">Input Nilai</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="data.html">Lihat Data Mahasiswa</a>
+            </li>
+          </ul>
         </div>
+      </div>
     </nav>
 
     <!-- Main Content -->
     <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card shadow">
-                    <div class="card-header bg-primary text-white text-center">
-                        <h4 class="mb-0">Formulir Input Nilai</h4>
-                    </div>
-                    <div class="card-body p-4">
-                        <!-- Alert untuk notifikasi -->
-                        <div id="alertContainer"></div>
-
-                        <!-- Form Input Nilai -->
-                        <form id="formInputNilai">
-                            <!-- Nama Lengkap -->
-                            <div class="mb-3">
-                                <label for="namaLengkap" class="form-label">Nama Lengkap</label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="namaLengkap"
-                                    placeholder="Masukkan nama lengkap"
-                                    required>
-                            </div>
-
-                            <!-- NIM (Nomor Induk Mahasiswa) -->
-                            <div class="mb-3">
-                                <label for="nim" class="form-label">NIM (Nomor Induk Mahasiswa)</label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="nim"
-                                    placeholder="Contoh: 10119001"
-                                    required>
-                            </div>
-
-                            <!-- Mata Kuliah -->
-                            <div class="mb-3">
-                                <label for="mataKuliah" class="form-label">Mata Kuliah</label>
-                                <select class="form-select" id="mataKuliah" required>
-                                    <option value="" selected disabled>Pilih mata kuliah...</option>
-                                    <option value="MK001">MK001 - Kalkulus I</option>
-                                    <option value="MK002">MK002 - Fisika Dasar</option>
-                                    <option value="MK003">MK003 - Algoritma & Pemrograman</option>
-                                    <option value="MK004">MK004 - Bahasa Indonesia</option>
-                                    <option value="MK005">MK005 - Basis Data</option>
-                                    <option value="MK006">MK006 - Rekayasa Perangkat Lunak</option>
-                                </select>
-                            </div>
-
-                            <!-- Nilai Mahasiswa -->
-                            <div class="mb-4">
-                                <label for="nilaiMahasiswa" class="form-label">Nilai Mahasiswa</label>
-                                <input
-                                    type="number"
-                                    class="form-control"
-                                    id="nilaiMahasiswa"
-                                    placeholder="85.5"
-                                    min="0"
-                                    max="100"
-                                    step="0.01"
-                                    required>
-                                <small class="text-muted">Masukkan nilai antara 0 - 100</small>
-                            </div>
-
-                            <!-- Submit Button -->
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    Simpan Data
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Info Box -->
-                <div class="card mt-3 border-info">
-                    <div class="card-body">
-                        <p class="mb-0 text-muted small">
-                            <strong>Catatan:</strong> Pastikan semua data terisi dengan benar sebelum menyimpan.
-                            Setelah data berhasil disimpan, Anda dapat melihat hasilnya di halaman
-                            <a href="data.html">Lihat Data Mahasiswa</a>.
-                        </p>
-                    </div>
-                </div>
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+          <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+              <h4 class="mb-0">Formulir Input Nilai</h4>
             </div>
+            <div class="card-body p-4">
+              <!-- Alert untuk notifikasi -->
+              <div id="alertContainer"></div>
+
+              <!-- Form Input Nilai -->
+              <form id="formInputNilai">
+                <!-- Nama Lengkap -->
+                <div class="mb-3">
+                  <label for="namaLengkap" class="form-label"
+                    >Nama Lengkap</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="namaLengkap"
+                    placeholder="Masukkan nama lengkap"
+                    required
+                  />
+                </div>
+
+                <!-- NIM (Nomor Induk Mahasiswa) -->
+                <div class="mb-3">
+                  <label for="nim" class="form-label"
+                    >NIM (Nomor Induk Mahasiswa)</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nim"
+                    placeholder="Contoh: 10119001"
+                    required
+                  />
+                </div>
+
+                <!-- Mata Kuliah -->
+                <div class="mb-3">
+                  <label for="mataKuliah" class="form-label">Mata Kuliah</label>
+                  <select class="form-select" id="mataKuliah" required>
+                    <option value="" selected disabled>
+                      Pilih mata kuliah...
+                    </option>
+                    <option value="MK001">MK001 - Kalkulus I</option>
+                    <option value="MK002">MK002 - Fisika Dasar</option>
+                    <option value="MK003">
+                      MK003 - Algoritma & Pemrograman
+                    </option>
+                    <option value="MK004">MK004 - Bahasa Indonesia</option>
+                    <option value="MK005">MK005 - Basis Data</option>
+                    <option value="MK006">
+                      MK006 - Rekayasa Perangkat Lunak
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Nilai Mahasiswa -->
+                <div class="mb-4">
+                  <label for="nilaiMahasiswa" class="form-label"
+                    >Nilai Mahasiswa</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="nilaiMahasiswa"
+                    placeholder="85.5"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    required
+                  />
+                  <small class="text-muted"
+                    >Masukkan nilai antara 0 - 100</small
+                  >
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary btn-lg">
+                    Simpan Data
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Info Box -->
+          <div class="card mt-3 border-info">
+            <div class="card-body">
+              <p class="mb-0 text-muted small">
+                <strong>Catatan:</strong> Pastikan semua data terisi dengan
+                benar sebelum menyimpan. Setelah data berhasil disimpan, Anda
+                dapat melihat hasilnya di halaman
+                <a href="data.html">Lihat Data Mahasiswa</a>.
+              </p>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Footer -->
     <footer class="footer mt-5 py-3 bg-light">
-        <div class="container text-center">
-            <span class="text-muted">Portal Akademik &copy; 2025 - Sistem Input Nilai Mahasiswa</span>
-        </div>
+      <div class="container text-center">
+        <span class="text-muted"
+          >Portal Akademik &copy; 2025 - Sistem Input Nilai Mahasiswa</span
+        >
+      </div>
     </footer>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Firebase SDK -->
-    <!-- Script akan ditambahkan di tahap selanjutnya -->
-
     <!-- Custom JavaScript -->
-    <!-- Script akan ditambahkan di tahap selanjutnya -->
-</body>
+    <script src="js/logic.js"></script>
+    <script src="js/main.js"></script>
+  </body>
 </html>

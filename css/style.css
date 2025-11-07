@@ -427,6 +427,7 @@ html {
    Custom Scrollbar (Webkit)
    =========================== */
 
+/* Scrollbar untuk seluruh halaman */
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -442,4 +443,47 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* Scrollbar khusus untuk tabel */
+.table-responsive::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #0d6efd;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #0b5ed7;
+}
+
+/* Scrollbar untuk Firefox */
+.table-responsive {
+  scrollbar-width: thin;
+  scrollbar-color: #0d6efd #f8f9fa;
+}
+
+/* Styling tambahan untuk tabel dengan scroll */
+.table-responsive {
+  position: relative;
+}
+
+/* Shadow effect saat scroll */
+.table-responsive::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: linear-gradient(to top, rgba(0,0,0,0.05), transparent);
+  pointer-events: none;
 }
