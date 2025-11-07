@@ -5,10 +5,14 @@
  * 1. Halaman input nilai (index.html)
  * 2. Halaman lihat data (data.html)
  * 3. Event handler dan UI management
+ * 4. Menggunakan fungsi dari logic.js untuk validasi, simpan, dan load data
  */
 
+// Import fungsi dari logic.js
+import { validasiInput, simpanData, loadData, getNamaMataKuliah } from './logic.js';
+
 // ========================================
-// BAGIAN 1: FUNGSI UNTUK HALAMAN INPUT NILAI
+// BAGIAN 1: FUNGSI UMUM (UNTUK KEDUA HALAMAN)
 // ========================================
 
 /**
@@ -59,11 +63,11 @@ function resetForm() {
  * Event handler untuk form submit
  * Alur sesuai Activity Diagram:
  * 1. Ambil data dari form
- * 2. Validasi input menggunakan validasiInput()
- * 3. Jika valid, simpan data menggunakan simpanData()
+ * 2. Validasi input menggunakan validasiInput() dari logic.js
+ * 3. Jika valid, simpan data menggunakan simpanData() dari logic.js
  * 4. Tampilkan notifikasi hasil
  */
-function handleFormSubmit(event) {
+async function handleFormSubmit(event) {
     // Prevent default form submission
     event.preventDefault();
 
@@ -103,8 +107,8 @@ function handleFormSubmit(event) {
 
     console.log('✅ Validasi berhasil, menyimpan data...');
 
-    // LANGKAH 3: Jika validasi berhasil, simpan data
-    const hasilSimpan = simpanData(dataInput);
+    // LANGKAH 3: Jika validasi berhasil, simpan data (async)
+    const hasilSimpan = await simpanData(dataInput);
 
     // LANGKAH 4: Tampilkan notifikasi hasil penyimpanan
     if (hasilSimpan.success) {
@@ -130,125 +134,110 @@ function handleFormSubmit(event) {
 }
 
 // ========================================
-// BAGIAN 2: FUNGSI UNTUK HALAMAN LIHAT DATA
+// BAGIAN 2: FUNGSI UNTUK HALAMAN DATA (DATA.HTML)
 // ========================================
 
 /**
- * Fungsi untuk merender data ke dalam tabel HTML
- *
- * @param {Array} data - Array berisi data nilai mahasiswa
+ * Fungsi helper untuk menentukan class badge berdasarkan nilai
+ * @param {number} nilai - Nilai mahasiswa
+ * @returns {string} - Class Bootstrap untuk badge
  */
-function renderTableData(data) {
-    const tableBody = document.getElementById('tableBody');
+function getNilaiBadgeClass(nilai) {
+    if (nilai >= 80) return 'bg-success';
+    if (nilai >= 70) return 'bg-primary';
+    if (nilai >= 60) return 'bg-warning';
+    return 'bg-danger';
+}
+
+/**
+ * Fungsi untuk memuat dan menampilkan data dari Firestore
+ * Menggunakan fungsi loadData() dari logic.js
+ */
+async function muatDanTampilkanData() {
+    const loadingIndicator = document.getElementById('loadingIndicator');
     const tableContainer = document.getElementById('tableContainer');
     const emptyState = document.getElementById('emptyState');
+    const tableBody = document.getElementById('tableBody');
 
-    // Bersihkan isi tabel terlebih dahulu
-    tableBody.innerHTML = '';
-
-    // Cek apakah ada data
-    if (!data || data.length === 0) {
-        // Tampilkan empty state
+    try {
+        // Tampilkan loading indicator
+        loadingIndicator.style.display = 'block';
         tableContainer.style.display = 'none';
-        emptyState.style.display = 'block';
-        return;
-    }
+        emptyState.style.display = 'none';
 
-    // Sembunyikan empty state, tampilkan tabel
-    tableContainer.style.display = 'block';
-    emptyState.style.display = 'none';
+        console.log('🔄 Memuat data dari Firestore...');
 
-    // Loop data dan buat baris tabel
-    data.forEach((item, index) => {
-        const row = document.createElement('tr');
+        // Panggil fungsi loadData() dari logic.js
+        const result = await loadData();
 
-        // Tentukan warna badge berdasarkan nilai
-        let badgeClass = 'bg-danger'; // Merah untuk nilai < 60
-        if (item.nilai >= 80) {
-            badgeClass = 'bg-success'; // Hijau untuk nilai >= 80
-        } else if (item.nilai >= 60) {
-            badgeClass = 'bg-warning'; // Kuning untuk nilai 60-79
-        }
+        // Sembunyikan loading indicator
+        loadingIndicator.style.display = 'none';
 
-        row.innerHTML = `
-            <td class="text-center">${index + 1}</td>
-            <td>${item.nama}</td>
-            <td class="text-center"><code>${item.nim}</code></td>
-            <td>${getNamaMataKuliah(item.kodeMk)}</td>
-            <td class="text-center">
-                <span class="badge ${badgeClass} px-3 py-2">${item.nilai}</span>
-            </td>
-        `;
-
-        tableBody.appendChild(row);
-    });
-
-    console.log(`✅ Berhasil merender ${data.length} baris data`);
-}
-
-/**
- * Fungsi untuk menampilkan atau menyembunyikan loading indicator
- *
- * @param {boolean} isLoading - true untuk tampilkan, false untuk sembunyikan
- */
-function toggleLoading(isLoading) {
-    const loadingIndicator = document.getElementById('loadingIndicator');
-
-    if (loadingIndicator) {
-        loadingIndicator.style.display = isLoading ? 'block' : 'none';
-    }
-}
-
-/**
- * Fungsi untuk memuat dan menampilkan data nilai mahasiswa
- * Implementasi alur sesuai Activity Diagram:
- * 1. Tampilkan loading
- * 2. Panggil loadData() untuk mengambil data
- * 3. Tampilkan data ke tabel
- */
-function muatDanTampilkanData() {
-    console.log('🔄 Memulai proses load data...');
-
-    // Tampilkan loading indicator
-    toggleLoading(true);
-
-    // Simulasi delay untuk UX yang lebih baik
-    setTimeout(function() {
-        // LANGKAH 1: Load data dari storage menggunakan fungsi dari logic.js
-        const result = loadData();
-
-        console.log('📊 Hasil load data:', result);
-
-        // Sembunyikan loading
-        toggleLoading(false);
-
-        // LANGKAH 2: Cek apakah load data berhasil
-        if (result.success) {
-            const data = result.data;
-
-            console.log(`✅ Load data berhasil, ditemukan ${data.length} data`);
-
-            // LANGKAH 3: Render data ke tabel
-            renderTableData(data);
-
-            // LANGKAH 4: Log hasil
-            if (data.length > 0) {
-                console.log('✅ Data berhasil ditampilkan');
-            } else {
-                console.log('ℹ️ Tidak ada data untuk ditampilkan');
-            }
-        } else {
-            // Jika gagal load data, tampilkan error
-            console.error('❌ Gagal load data:', result.message);
+        // Cek apakah load berhasil
+        if (!result.success) {
+            // Tampilkan pesan error
             tampilkanAlert(
-                `<strong>Error!</strong> ${result.message}`,
+                `Gagal memuat data: ${result.message}. Pastikan Anda telah mengaktifkan Cloud Firestore dan mengatur rules yang benar.`,
                 'danger'
             );
-
-            // Tampilkan empty state
-            renderTableData([]);
+            emptyState.style.display = 'block';
+            return;
         }
-    }, 800);
+
+        const dataMahasiswa = result.data;
+
+        // Cek apakah ada data
+        if (!dataMahasiswa || dataMahasiswa.length === 0) {
+            // Tampilkan empty state jika tidak ada data
+            emptyState.style.display = 'block';
+            console.log('ℹ️ Tidak ada data untuk ditampilkan');
+            return;
+        }
+
+        // Kosongkan tabel terlebih dahulu
+        tableBody.innerHTML = '';
+
+        // Loop melalui setiap data dan tambahkan ke tabel
+        let nomor = 1;
+        dataMahasiswa.forEach((item) => {
+            const row = `
+        <tr>
+          <td class="text-center">${nomor}</td>
+          <td>${item.nama || '-'}</td>
+          <td class="text-center">${item.nim || '-'}</td>
+          <td>${getNamaMataKuliah(item.kode_mk)}</td>
+          <td class="text-center">
+            <span class="badge ${getNilaiBadgeClass(item.nilai)} fs-6">
+              ${item.nilai !== undefined ? item.nilai.toFixed(2) : '-'}
+            </span>
+          </td>
+        </tr>
+      `;
+
+            tableBody.innerHTML += row;
+            nomor++;
+        });
+
+        // Tampilkan tabel
+        tableContainer.style.display = 'block';
+
+        console.log(`✅ Berhasil memuat ${dataMahasiswa.length} data mahasiswa`);
+
+    } catch (error) {
+        console.error("❌ Error memuat data: ", error);
+
+        // Sembunyikan loading indicator
+        loadingIndicator.style.display = 'none';
+
+        // Tampilkan pesan error
+        tampilkanAlert(
+            `Gagal memuat data: ${error.message}`,
+            'danger'
+        );
+
+        // Tampilkan empty state
+        emptyState.style.display = 'block';
+    }
 }
 
 // ========================================
@@ -280,18 +269,11 @@ function initApp() {
     }
 
     // Log informasi aplikasi
-    console.log('📋 Menggunakan localStorage untuk penyimpanan sementara');
+    console.log('📋 Menggunakan Firebase Firestore untuk penyimpanan data');
     console.log('🎯 Aplikasi siap digunakan');
 }
 
-// ========================================
-// BAGIAN 4: JALANKAN SAAT DOM LOADED
-// ========================================
-
-/**
- * Event listener untuk DOMContentLoaded
- * Memastikan semua elemen HTML sudah dimuat sebelum JavaScript dijalankan
- */
+// Jalankan inisialisasi saat DOM loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 DOM Content Loaded');
     initApp();

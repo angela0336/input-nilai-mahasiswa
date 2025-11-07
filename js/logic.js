@@ -1,14 +1,23 @@
 /**
  * Logic Layer - Application Logic
  *
- * File ini berisi fungsi-fungsi utama untuk menghubungkan UI dengan Database
+ * File ini berisi fungsi-fungsi utama untuk menghubungkan UI dengan Database (Firestore)
  * Mengimplementasikan logika bisnis sesuai dengan Activity Diagram dan Class Diagram
  *
  * Fungsi utama:
  * 1. validasiInput() - Memvalidasi data input dari form
- * 2. simpanData() - Menyimpan data ke storage
- * 3. loadData() - Mengambil dan menampilkan data dari storage
+ * 2. simpanData() - Menyimpan data ke Firestore
+ * 3. loadData() - Mengambil dan menampilkan data dari Firestore
  */
+
+import { db } from './firebase-config.js';
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // ========================================
 // 1. FUNGSI VALIDASI INPUT
@@ -74,19 +83,19 @@ function validasiInput(data) {
 // ========================================
 
 /**
- * Fungsi untuk menyimpan data nilai mahasiswa
- * Data disimpan ke localStorage (sementara, nanti akan diganti Firebase)
+ * Fungsi untuk menyimpan data nilai mahasiswa ke Firestore
+ * Data disimpan ke collection 'nilai_mahasiswa'
  *
  * Alur:
  * 1. Validasi data terlebih dahulu menggunakan validasiInput()
  * 2. Jika validasi gagal, return error
- * 3. Jika validasi berhasil, simpan data ke storage
+ * 3. Jika validasi berhasil, simpan data ke Firestore
  * 4. Return success message
  *
  * @param {Object} data - Object berisi data mahasiswa
- * @return {Object} Object berisi status penyimpanan (success, message)
+ * @return {Promise<Object>} Object berisi status penyimpanan (success, message, id)
  */
-function simpanData(data) {
+async function simpanData(data) {
     try {
         // LANGKAH 1: Validasi data terlebih dahulu
         const validasi = validasiInput(data);
@@ -101,34 +110,23 @@ function simpanData(data) {
 
         // LANGKAH 2: Persiapkan data untuk disimpan
         const dataNilai = {
-            id: Date.now().toString(), // Generate ID unik berdasarkan timestamp
             nim: data.nim.trim(),
             nama: data.nama.trim(),
-            kodeMk: data.kodeMk.trim(),
+            kode_mk: data.kodeMk.trim(),
             nilai: parseFloat(data.nilai),
-            timestamp: new Date().toISOString() // Waktu penyimpanan
+            timestamp: new Date() // Waktu penyimpanan
         };
 
-        // LANGKAH 3: Ambil data yang sudah ada dari localStorage
-        let dataMahasiswa = [];
-        const existingData = localStorage.getItem('dataNilai');
-        if (existingData) {
-            dataMahasiswa = JSON.parse(existingData);
-        }
+        // LANGKAH 3: Simpan data ke Firestore
+        const docRef = await addDoc(collection(db, "nilai_mahasiswa"), dataNilai);
 
-        // LANGKAH 4: Tambahkan data baru ke array
-        dataMahasiswa.push(dataNilai);
-
-        // LANGKAH 5: Simpan kembali ke localStorage
-        localStorage.setItem('dataNilai', JSON.stringify(dataMahasiswa));
-
-        console.log('✅ Data berhasil disimpan:', dataNilai);
+        console.log('✅ Data berhasil disimpan dengan ID:', docRef.id);
 
         // Return success
         return {
             success: true,
             message: 'Data berhasil disimpan!',
-            id: dataNilai.id
+            id: docRef.id
         };
 
     } catch (error) {
@@ -145,27 +143,32 @@ function simpanData(data) {
 // ========================================
 
 /**
- * Fungsi untuk mengambil dan menampilkan data nilai mahasiswa
- * Data diambil dari localStorage (sementara, nanti akan diganti Firebase)
+ * Fungsi untuk mengambil dan menampilkan data nilai mahasiswa dari Firestore
+ * Data diambil dari collection 'nilai_mahasiswa'
  *
- * @return {Object} Object berisi status (success) dan array data mahasiswa
+ * @return {Promise<Object>} Object berisi status (success) dan array data mahasiswa
  */
-function loadData() {
+async function loadData() {
     try {
-        // Ambil data dari localStorage
-        const existingData = localStorage.getItem('dataNilai');
+        // Query untuk mengambil semua data dari collection 'nilai_mahasiswa'
+        // Diurutkan berdasarkan timestamp descending (data terbaru di atas)
+        const q = query(
+            collection(db, "nilai_mahasiswa"),
+            orderBy("timestamp", "desc")
+        );
 
-        // Jika tidak ada data, return array kosong
-        if (!existingData) {
-            return {
-                success: true,
-                data: [],
-                count: 0
-            };
-        }
+        const querySnapshot = await getDocs(q);
 
-        // Parse data JSON
-        const dataMahasiswa = JSON.parse(existingData);
+        // Array untuk menyimpan data
+        const dataMahasiswa = [];
+
+        // Loop setiap dokumen dan masukkan ke array
+        querySnapshot.forEach((doc) => {
+            dataMahasiswa.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
 
         console.log('✅ Berhasil memuat', dataMahasiswa.length, 'data');
 
@@ -181,7 +184,8 @@ function loadData() {
         return {
             success: false,
             message: 'Gagal memuat data: ' + error.message,
-            data: []
+            data: [],
+            count: 0
         };
     }
 }
@@ -209,3 +213,6 @@ function getNamaMataKuliah(kodeMk) {
 
     return mataKuliah[kodeMk] || kodeMk;
 }
+
+// Export fungsi-fungsi untuk digunakan di file lain
+export { validasiInput, simpanData, loadData, getNamaMataKuliah };
